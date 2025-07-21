@@ -1,5 +1,5 @@
 plugins {
-    id("java-library")
+    id("java")
     id("maven-publish")
 }
 
@@ -9,8 +9,8 @@ java {
 }
 
 dependencies {
-    api(libs.ormLiteJdbc)
-    api(libs.wutilsJdbc)
+    compileOnly(libs.ormLiteJdbc)
+    compileOnly(libs.wutilsJdbc)
 }
 
 publishing {
