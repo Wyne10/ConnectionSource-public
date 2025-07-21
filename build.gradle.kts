@@ -32,12 +32,9 @@ tasks {
     shadowJar {
         archiveBaseName.set(findProperty("name").toString())
         archiveClassifier.set("")
-        minimize()
         if (!isDebug) {
             relocate("com.google.inject", "org.bigcraft.connection.shadow.google.guice")
             relocate("com.google.common", "org.bigcraft.connection.shadow.google.common")
-            relocate("com.j256.ormlite", "org.bigcraft.connection.shadow.j256.ormlite")
-            relocate("com.zaxxer.hikari", "org.bigcraft.connection.shadow.zaxxer.hikari")
             relocate("me.wyne.wutils", "org.bigcraft.connection.shadow.wutils")
         }
     }

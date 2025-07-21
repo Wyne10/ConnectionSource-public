@@ -1,5 +1,5 @@
 plugins {
-    id("java")
+    id("java-library")
     id("maven-publish")
 }
 
@@ -10,7 +10,7 @@ java {
 
 dependencies {
     compileOnly("org.jetbrains:annotations:26.0.2")
-    compileOnly(libs.ormLiteJdbc)
+    compileOnlyApi(libs.ormLiteJdbc)
 }
 
 publishing {
