@@ -1,8 +1,8 @@
-package org.bigcraft.plugin.module;
+package org.bigcraft.connection.module;
 
 import com.google.inject.AbstractModule;
-import org.bigcraft.plugin.ConnectionSource;
-import org.bigcraft.plugin.command.ConnectionCommand;
+import org.bigcraft.connection.ConnectionSource;
+import org.bigcraft.connection.command.ConnectionCommand;
 
 public class CommandModule extends AbstractModule {
     @Override

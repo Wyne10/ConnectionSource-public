@@ -1,14 +1,19 @@
-package org.bigcraft.plugin;
+package org.bigcraft.connection;
 
 import com.google.inject.*;
+import com.j256.ormlite.logger.Logger;
 import lombok.Getter;
 import me.wyne.wutils.config.Config;
 import me.wyne.wutils.log.JulLevel;
 import me.wyne.wutils.log.Level;
 import me.wyne.wutils.log.Log;
 import me.wyne.wutils.log.Log4jFactory;
-import org.bigcraft.plugin.module.CommandModule;
-import org.bigcraft.plugin.module.PluginModule;
+import org.bigcraft.connection.config.SqlConfig;
+import org.bigcraft.connection.module.ApiModule;
+import org.bigcraft.connection.module.CommandModule;
+import org.bigcraft.connection.module.ConnectionModule;
+import org.bigcraft.connection.module.PluginModule;
+import org.bigcraft.connection.sql.ConnectionProvider;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -35,7 +40,9 @@ public class ConnectionSource extends JavaPlugin {
             injector =  Guice.createInjector(
                     Stage.PRODUCTION,
                     new PluginModule(this),
-                    new CommandModule()
+                    new CommandModule(),
+                    new ConnectionModule(),
+                    new ApiModule()
             );
         } catch (CreationException e) {
             log.error("Guice injector creation exception", e);
@@ -44,7 +51,8 @@ public class ConnectionSource extends JavaPlugin {
         initializeConfig();
 
         try {
-            // TODO Start model
+            injector.getInstance(SqlConfig.class).registerDriver();
+            injector.getInstance(ConnectionProvider.class).reloadConnectionPool();
         } catch (ConfigurationException | ProvisionException e) {
             log.error("Guice configuration/provision exception", e);
         }
@@ -52,11 +60,12 @@ public class ConnectionSource extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        // TODO Close connection
+        injector.getInstance(ConnectionProvider.class).close();
     }
 
     private void initializeLogger()
     {
+        Logger.setGlobalLogLevel(com.j256.ormlite.logger.Level.INFO);
         Log.global = Log.builder()
                 .setLogger(getLogger())
                 .setLevel(JulLevel.valueOf(getConfig().getString("logLevel", "INFO")).getLevel())
@@ -90,7 +99,8 @@ public class ConnectionSource extends JavaPlugin {
         getConfig().setDefaults(new MemoryConfiguration());
         Config.global.reloadConfig(getConfig());
         try {
-            // TODO Reload model
+            injector.getInstance(SqlConfig.class).registerDriver();
+            injector.getInstance(ConnectionProvider.class).reloadConnectionPool();
         } catch (ConfigurationException | ProvisionException e) {
             log.error("Guice configuration/provision exception", e);
         }

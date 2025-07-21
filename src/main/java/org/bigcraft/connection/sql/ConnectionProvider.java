@@ -1,0 +1,50 @@
+package org.bigcraft.connection.sql;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import lombok.Getter;
+import lombok.SneakyThrows;
+import me.wyne.wutils.jdbc.ConnectionPool;
+import me.wyne.wutils.jdbc.HikariOrmLiteConnectionPool;
+import org.bigcraft.connection.ConnectionSource;
+import org.bigcraft.connection.config.SqlConfig;
+
+@Singleton
+@Getter
+public class ConnectionProvider implements org.bigcraft.connection.api.ConnectionProvider {
+
+    private ConnectionPool<com.j256.ormlite.support.ConnectionSource> connectionPool;
+
+    private final ConnectionSource plugin;
+    private final SqlConfig config;
+
+    @Inject
+    public ConnectionProvider(ConnectionSource plugin, SqlConfig config) {
+        this.plugin = plugin;
+        this.config = config;
+    }
+
+    @Override
+    public void reloadConnectionPool() {
+        if (!config.isConfigured()) {
+            plugin.getLog().warn("SQL connection is not configured");
+            return;
+        }
+        if (connectionPool != null)
+            close();
+        this.connectionPool = new HikariOrmLiteConnectionPool(config.getJdbcUrl(), config.getUsername(), config.getPassword(), plugin.getLog());
+    }
+
+    @Override
+    public boolean isActive() {
+        return connectionPool != null && connectionPool.isActive();
+    }
+
+    @SneakyThrows
+    @Override
+    public void close() {
+        if (connectionPool != null)
+            connectionPool.close();
+    }
+
+}

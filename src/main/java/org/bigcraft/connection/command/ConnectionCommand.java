@@ -1,10 +1,10 @@
-package org.bigcraft.plugin.command;
+package org.bigcraft.connection.command;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import dev.jorel.commandapi.CommandTree;
 import dev.jorel.commandapi.arguments.LiteralArgument;
-import org.bigcraft.plugin.ConnectionSource;
+import org.bigcraft.connection.ConnectionSource;
 
 @Singleton
 public class ConnectionCommand {
@@ -23,6 +23,7 @@ public class ConnectionCommand {
                         .withPermission("connection.reload")
                         .executes((sender, args) -> {
                             plugin.reload();
+                            plugin.getLog().info("Reloaded connection source");
                         }))
                 .register(plugin);
     }

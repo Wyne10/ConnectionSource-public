@@ -2,7 +2,7 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 }
 
-rootProject.name = "PluginTemplate" // TODO Insert name
+rootProject.name = "ConnectionSource"
 
 dependencyResolutionManagement {
     repositories {
@@ -21,3 +21,4 @@ dependencyResolutionManagement {
         }
     }
 }
+include("api")

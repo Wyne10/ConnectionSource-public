@@ -1,7 +1,7 @@
-package org.bigcraft.plugin.module;
+package org.bigcraft.connection.module;
 
 import com.google.inject.AbstractModule;
-import org.bigcraft.plugin.ConnectionSource;
+import org.bigcraft.connection.ConnectionSource;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
