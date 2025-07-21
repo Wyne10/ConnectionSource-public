@@ -23,7 +23,6 @@ dependencies {
     implementation(libs.ormLiteJdbc)
 
     implementation(libs.wutilsConfig)
-    implementation(libs.wutilsJdbc)
     implementation(libs.wutilsLog)
 }
 

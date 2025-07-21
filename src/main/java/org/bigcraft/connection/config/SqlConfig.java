@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import me.wyne.wutils.config.Config;
 import me.wyne.wutils.config.ConfigEntry;
-import me.wyne.wutils.jdbc.DriverLibrary;
+import org.bigcraft.connection.jdbc.DriverLibrary;
 
 @SuppressWarnings("FieldMayBeFinal")
 @Singleton
