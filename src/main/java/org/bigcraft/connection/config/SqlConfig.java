@@ -19,7 +19,7 @@ public class SqlConfig implements org.bigcraft.connection.api.SqlConfig {
     private String jdbcUrl = "jdbc:mysql://localhost:3306/test";
 
     @ConfigEntry(section = "SQL")
-    private String username, password;
+    private String username = "", password = "";
 
     @Inject
     public SqlConfig() {
