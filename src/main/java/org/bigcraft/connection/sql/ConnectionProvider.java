@@ -30,7 +30,8 @@ public class ConnectionProvider implements org.bigcraft.connection.api.Connectio
             plugin.getLog().warn("SQL connection is not configured");
             return;
         }
-        close();
+        if (connectionPool != null)
+            close();
         this.connectionPool = new HikariOrmLiteConnectionPool(config.getJdbcUrl(), config.getUsername(), config.getPassword(), plugin.getLog());
     }
 
