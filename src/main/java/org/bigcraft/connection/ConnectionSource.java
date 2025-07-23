@@ -9,10 +9,8 @@ import me.wyne.wutils.log.Level;
 import me.wyne.wutils.log.Log;
 import me.wyne.wutils.log.Log4jFactory;
 import org.bigcraft.connection.config.SqlConfig;
-import org.bigcraft.connection.module.ApiModule;
-import org.bigcraft.connection.module.CommandModule;
-import org.bigcraft.connection.module.ConnectionModule;
-import org.bigcraft.connection.module.PluginModule;
+import org.bigcraft.connection.listener.PlayerListener;
+import org.bigcraft.connection.module.*;
 import org.bigcraft.connection.sql.ConnectionProvider;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -42,7 +40,8 @@ public class ConnectionSource extends JavaPlugin {
                     new PluginModule(this),
                     new CommandModule(),
                     new ConnectionModule(),
-                    new ApiModule()
+                    new ApiModule(),
+                    new ListenerModule()
             );
         } catch (CreationException e) {
             log.error("Guice injector creation exception", e);
@@ -53,6 +52,7 @@ public class ConnectionSource extends JavaPlugin {
         try {
             injector.getInstance(SqlConfig.class).registerDriver();
             injector.getInstance(ConnectionProvider.class).reloadConnectionPool();
+            injector.getInstance(PlayerListener.class).load();
         } catch (ConfigurationException | ProvisionException e) {
             log.error("Guice configuration/provision exception", e);
         }
@@ -60,6 +60,7 @@ public class ConnectionSource extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        injector.getInstance(PlayerListener.class).close();
         injector.getInstance(ConnectionProvider.class).close();
     }
 
@@ -101,6 +102,7 @@ public class ConnectionSource extends JavaPlugin {
         try {
             injector.getInstance(SqlConfig.class).registerDriver();
             injector.getInstance(ConnectionProvider.class).reloadConnectionPool();
+            injector.getInstance(PlayerListener.class).load();
         } catch (ConfigurationException | ProvisionException e) {
             log.error("Guice configuration/provision exception", e);
         }
