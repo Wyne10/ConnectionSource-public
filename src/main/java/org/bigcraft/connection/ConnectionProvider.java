@@ -1,13 +1,12 @@
-package org.bigcraft.connection.sql;
+package org.bigcraft.connection;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.SneakyThrows;
-import org.bigcraft.connection.ConnectionSource;
 import org.bigcraft.connection.api.ConnectionPool;
 import org.bigcraft.connection.config.SqlConfig;
-import org.bigcraft.connection.jdbc.HikariOrmLiteConnectionPool;
+import org.bigcraft.connection.pool.HikariOrmLiteConnectionPool;
 
 @Singleton
 @Getter

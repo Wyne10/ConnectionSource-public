@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import dev.jorel.commandapi.CommandTree;
 import dev.jorel.commandapi.arguments.LiteralArgument;
 import org.bigcraft.connection.ConnectionSource;
-import org.bigcraft.connection.sql.ConnectionProvider;
+import org.bigcraft.connection.ConnectionProvider;
 
 @Singleton
 public class ConnectionCommand {

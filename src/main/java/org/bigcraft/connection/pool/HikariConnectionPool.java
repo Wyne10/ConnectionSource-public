@@ -1,7 +1,5 @@
-package org.bigcraft.connection.jdbc;
+package org.bigcraft.connection.pool;
 
-import com.j256.ormlite.jdbc.DataSourceConnectionSource;
-import com.j256.ormlite.support.ConnectionSource;
 import com.zaxxer.hikari.HikariDataSource;
 import org.bigcraft.connection.api.ConnectionPool;
 import org.jetbrains.annotations.Nullable;
@@ -10,7 +8,7 @@ import org.slf4j.Logger;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class HikariOrmLiteConnectionPool implements ConnectionPool<ConnectionSource> {
+public class HikariConnectionPool implements ConnectionPool<HikariDataSource> {
 
     private final Logger logger;
 
@@ -19,9 +17,8 @@ public class HikariOrmLiteConnectionPool implements ConnectionPool<ConnectionSou
     private final String password;
 
     private final HikariDataSource dataSource = new HikariDataSource();
-    private ConnectionSource connectionSource;
 
-    public HikariOrmLiteConnectionPool(String url, String username, String password, Logger logger) {
+    public HikariConnectionPool(String url, String username, String password, Logger logger) {
         this.url = url;
         this.username = username;
         this.password = password;
@@ -33,11 +30,7 @@ public class HikariOrmLiteConnectionPool implements ConnectionPool<ConnectionSou
         dataSource.setJdbcUrl(url);
         dataSource.setUsername(username);
         dataSource.setPassword(password);
-        try {
-            connectionSource = new DataSourceConnectionSource(dataSource, url);
-        } catch (SQLException e) {
-            logger.error("An exception occurred trying to establish data source connection with {}", url, e);
-        }
+        dataSource.setAutoCommit(false);
     }
 
     @Override
@@ -56,8 +49,8 @@ public class HikariOrmLiteConnectionPool implements ConnectionPool<ConnectionSou
     }
 
     @Override
-    public @Nullable ConnectionSource getSource() {
-        return connectionSource;
+    public @Nullable HikariDataSource getSource() {
+        return dataSource;
     }
 
     @Override

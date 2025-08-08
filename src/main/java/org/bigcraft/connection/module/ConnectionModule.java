@@ -8,6 +8,6 @@ public class ConnectionModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(SqlConfig.class).to(org.bigcraft.connection.config.SqlConfig.class);
-        bind(ConnectionProvider.class).to(org.bigcraft.connection.sql.ConnectionProvider.class);
+        bind(ConnectionProvider.class).to(org.bigcraft.connection.ConnectionProvider.class);
     }
 }

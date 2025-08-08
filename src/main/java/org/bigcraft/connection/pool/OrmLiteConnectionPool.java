@@ -1,4 +1,4 @@
-package org.bigcraft.connection.jdbc;
+package org.bigcraft.connection.pool;
 
 import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
