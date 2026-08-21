@@ -8,6 +8,8 @@ import org.bigcraft.connection.api.ConnectionPool;
 import org.bigcraft.connection.config.SqlConfig;
 import org.bigcraft.connection.pool.HikariOrmLiteConnectionPool;
 
+import java.sql.SQLException;
+
 @Singleton
 @Getter
 public class ConnectionProvider implements org.bigcraft.connection.api.ConnectionProvider {
@@ -31,7 +33,12 @@ public class ConnectionProvider implements org.bigcraft.connection.api.Connectio
         }
         if (connectionPool != null)
             close();
-        this.connectionPool = new HikariOrmLiteConnectionPool(config.getJdbcUrl(), config.getUsername(), config.getPassword(), plugin.getLog());
+        try {
+            this.connectionPool = new HikariOrmLiteConnectionPool(config.getJdbcUrl(), config.getUsername(), config.getPassword());
+        } catch (SQLException e) {
+            this.connectionPool = null;
+            plugin.getLog().error("An exception occurred trying to establish data source connection with {}", config.getJdbcUrl(), e);
+        }
     }
 
     @Override

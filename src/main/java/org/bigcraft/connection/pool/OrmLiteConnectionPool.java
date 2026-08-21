@@ -2,17 +2,14 @@ package org.bigcraft.connection.pool;
 
 import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
-import org.apache.commons.lang.NotImplementedException;
 import org.bigcraft.connection.api.ConnectionPool;
-import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.function.Consumer;
 
 public class OrmLiteConnectionPool implements ConnectionPool<ConnectionSource> {
-
-    private final Logger logger;
 
     private final String url;
     private final String username;
@@ -21,24 +18,29 @@ public class OrmLiteConnectionPool implements ConnectionPool<ConnectionSource> {
     private final JdbcPooledConnectionSource connectionSource = new JdbcPooledConnectionSource();
     private boolean isInitialized = false;
 
-    public OrmLiteConnectionPool(String url, String username, String password, Logger logger) {
+    public OrmLiteConnectionPool(@NotNull String url, @NotNull String username, @NotNull String password) throws SQLException {
+        this(url, username, password, source -> {});
+    }
+
+    public OrmLiteConnectionPool(@NotNull String url, @NotNull String username, @NotNull String password,
+                                 @NotNull Consumer<@NotNull JdbcPooledConnectionSource> configurator) throws SQLException {
         this.url = url;
         this.username = username;
         this.password = password;
-        this.logger = logger;
-        initializeDataSource();
+        initializeDataSource(configurator);
     }
 
-    private void initializeDataSource() {
+    public void initializeDataSource() throws SQLException {
+        initializeDataSource(source -> {});
+    }
+
+    public void initializeDataSource(@NotNull Consumer<@NotNull JdbcPooledConnectionSource> configurator) throws SQLException {
         connectionSource.setUrl(url);
         connectionSource.setUsername(username);
         connectionSource.setPassword(password);
-        try {
-            connectionSource.initialize();
-            isInitialized = true;
-        } catch (SQLException e) {
-            logger.error("An exception occurred trying to establish connection with {}", url, e);
-        }
+        configurator.accept(connectionSource);
+        connectionSource.initialize();
+        isInitialized = true;
     }
 
     @Override
@@ -46,19 +48,26 @@ public class OrmLiteConnectionPool implements ConnectionPool<ConnectionSource> {
         return isInitialized;
     }
 
+    /**
+     * Always throws, ORMLite manages connections internally, use {@link #getSource()} instead.
+     */
     @Override
-    public @Nullable Connection getConnection() {
-        throw new NotImplementedException("OrmLiteConnectionPool doesn't provide java.sql connections");
+    public @NotNull Connection getConnection() {
+        throw new UnsupportedOperationException("OrmLiteConnectionPool doesn't provide java.sql connections");
     }
 
     @Override
-    public @Nullable ConnectionSource getSource() {
+    public @NotNull ConnectionSource getSource() {
         return connectionSource;
     }
 
     @Override
-    public void close() {
-        connectionSource.closeQuietly();
+    public void close() throws Exception {
+        try {
+            connectionSource.close();
+        } finally {
+            isInitialized = false;
+        }
     }
 
 }

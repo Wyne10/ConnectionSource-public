@@ -2,15 +2,13 @@ package org.bigcraft.connection.pool;
 
 import com.zaxxer.hikari.HikariDataSource;
 import org.bigcraft.connection.api.ConnectionPool;
-import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.function.Consumer;
 
 public class HikariConnectionPool implements ConnectionPool<HikariDataSource> {
-
-    private final Logger logger;
 
     private final String url;
     private final String username;
@@ -18,19 +16,31 @@ public class HikariConnectionPool implements ConnectionPool<HikariDataSource> {
 
     private final HikariDataSource dataSource = new HikariDataSource();
 
-    public HikariConnectionPool(String url, String username, String password, Logger logger) {
+    public HikariConnectionPool(@NotNull String url, @NotNull String username, @NotNull String password) {
+        this(url, username, password, source -> {});
+    }
+
+    public HikariConnectionPool(@NotNull String url, @NotNull String username, @NotNull String password,
+                                @NotNull Consumer<@NotNull HikariDataSource> configurator) {
         this.url = url;
         this.username = username;
         this.password = password;
-        this.logger = logger;
-        initializeDataSource();
+        initializeDataSource(configurator);
     }
 
-    private void initializeDataSource() {
+    public void initializeDataSource() {
+        initializeDataSource(source -> {});
+    }
+
+    /**
+     * HikariCP seals a data source configuration once the pool has started, so calling this
+     * after the first connection has been handed out throws {@link IllegalStateException}.
+     */
+    public void initializeDataSource(@NotNull Consumer<@NotNull HikariDataSource> configurator) {
         dataSource.setJdbcUrl(url);
         dataSource.setUsername(username);
         dataSource.setPassword(password);
-        dataSource.setAutoCommit(false);
+        configurator.accept(dataSource);
     }
 
     @Override
@@ -39,17 +49,12 @@ public class HikariConnectionPool implements ConnectionPool<HikariDataSource> {
     }
 
     @Override
-    public @Nullable Connection getConnection() {
-        try {
-            return dataSource.getConnection();
-        } catch (SQLException e) {
-            logger.error("An exception occurred trying to establish connection with {}", url, e);
-        }
-        return null;
+    public @NotNull Connection getConnection() throws SQLException {
+        return dataSource.getConnection();
     }
 
     @Override
-    public @Nullable HikariDataSource getSource() {
+    public @NotNull HikariDataSource getSource() {
         return dataSource;
     }
 

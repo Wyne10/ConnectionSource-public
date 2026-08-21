@@ -4,15 +4,13 @@ import com.j256.ormlite.jdbc.DataSourceConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 import com.zaxxer.hikari.HikariDataSource;
 import org.bigcraft.connection.api.ConnectionPool;
-import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.function.Consumer;
 
 public class HikariOrmLiteConnectionPool implements ConnectionPool<ConnectionSource> {
-
-    private final Logger logger;
 
     private final String url;
     private final String username;
@@ -21,23 +19,32 @@ public class HikariOrmLiteConnectionPool implements ConnectionPool<ConnectionSou
     private final HikariDataSource dataSource = new HikariDataSource();
     private ConnectionSource connectionSource;
 
-    public HikariOrmLiteConnectionPool(String url, String username, String password, Logger logger) {
+    public HikariOrmLiteConnectionPool(@NotNull String url, @NotNull String username, @NotNull String password) throws SQLException {
+        this(url, username, password, source -> {});
+    }
+
+    public HikariOrmLiteConnectionPool(@NotNull String url, @NotNull String username, @NotNull String password,
+                                       @NotNull Consumer<@NotNull HikariDataSource> configurator) throws SQLException {
         this.url = url;
         this.username = username;
         this.password = password;
-        this.logger = logger;
-        initializeDataSource();
+        initializeDataSource(configurator);
     }
 
-    private void initializeDataSource() {
+    public void initializeDataSource() throws SQLException {
+        initializeDataSource(source -> {});
+    }
+
+    /**
+     * Building the connection source starts the Hikari pool, which seals its configuration,
+     * so the constructor configurator is the only usable hook for this implementation.
+     */
+    public void initializeDataSource(@NotNull Consumer<@NotNull HikariDataSource> configurator) throws SQLException {
         dataSource.setJdbcUrl(url);
         dataSource.setUsername(username);
         dataSource.setPassword(password);
-        try {
-            connectionSource = new DataSourceConnectionSource(dataSource, url);
-        } catch (SQLException e) {
-            logger.error("An exception occurred trying to establish data source connection with {}", url, e);
-        }
+        configurator.accept(dataSource);
+        connectionSource = new DataSourceConnectionSource(dataSource, url);
     }
 
     @Override
@@ -46,22 +53,18 @@ public class HikariOrmLiteConnectionPool implements ConnectionPool<ConnectionSou
     }
 
     @Override
-    public @Nullable Connection getConnection() {
-        try {
-            return dataSource.getConnection();
-        } catch (SQLException e) {
-            logger.error("An exception occurred trying to establish connection with {}", url, e);
-        }
-        return null;
+    public @NotNull Connection getConnection() throws SQLException {
+        return dataSource.getConnection();
     }
 
     @Override
-    public @Nullable ConnectionSource getSource() {
+    public @NotNull ConnectionSource getSource() {
         return connectionSource;
     }
 
     @Override
-    public void close() {
+    public void close() throws Exception {
+        connectionSource.close();
         dataSource.close();
     }
 

@@ -1,5 +1,8 @@
 package org.bigcraft.connection.jdbc;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.sql.*;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -8,22 +11,22 @@ public class DriverShim implements Driver {
 
     private final Driver driver;
 
-    public DriverShim(Driver driver) {
+    public DriverShim(@NotNull Driver driver) {
         this.driver = driver;
     }
 
     @Override
-    public Connection connect(String url, Properties info) throws SQLException {
+    public @Nullable Connection connect(@NotNull String url, @Nullable Properties info) throws SQLException {
         return driver.connect(url, info);
     }
 
     @Override
-    public boolean acceptsURL(String url) throws SQLException {
+    public boolean acceptsURL(@NotNull String url) throws SQLException {
         return driver.acceptsURL(url);
     }
 
     @Override
-    public DriverPropertyInfo[] getPropertyInfo(String url, Properties info) throws SQLException {
+    public @NotNull DriverPropertyInfo[] getPropertyInfo(@NotNull String url, @Nullable Properties info) throws SQLException {
         return driver.getPropertyInfo(url, info);
     }
 
@@ -43,7 +46,7 @@ public class DriverShim implements Driver {
     }
 
     @Override
-    public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+    public @NotNull Logger getParentLogger() throws SQLFeatureNotSupportedException {
         return driver.getParentLogger();
     }
 

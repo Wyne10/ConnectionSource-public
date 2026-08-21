@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import me.wyne.wutils.config.Config;
 import me.wyne.wutils.config.ConfigEntry;
+import org.bigcraft.connection.ConnectionSource;
 import org.bigcraft.connection.jdbc.DriverLibrary;
 
 @SuppressWarnings("FieldMayBeFinal")
@@ -21,8 +22,11 @@ public class SqlConfig implements org.bigcraft.connection.api.SqlConfig {
     @ConfigEntry(section = "SQL")
     private String username = "", password = "";
 
+    private final ConnectionSource plugin;
+
     @Inject
-    public SqlConfig() {
+    public SqlConfig(ConnectionSource plugin) {
+        this.plugin = plugin;
         Config.global.registerConfigObject(this);
     }
 
@@ -35,7 +39,20 @@ public class SqlConfig implements org.bigcraft.connection.api.SqlConfig {
 
     @Override
     public void registerDriver() {
-        DriverLibrary.valueOf(driver).registerDriver();
+        DriverLibrary driverLibrary;
+        try {
+            driverLibrary = DriverLibrary.valueOf(driver);
+        } catch (IllegalArgumentException e) {
+            plugin.getLog().error("Unknown JDBC driver '{}'", driver);
+            return;
+        }
+
+        try {
+            driverLibrary.registerDriver();
+            plugin.getLog().info("Registered '{}' JDBC driver", driver);
+        } catch (Exception e) {
+            plugin.getLog().error("An exception occurred trying to register '{}' JDBC driver", driver, e);
+        }
     }
 
 }

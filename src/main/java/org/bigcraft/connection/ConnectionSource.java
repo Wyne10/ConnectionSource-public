@@ -9,7 +9,6 @@ import me.wyne.wutils.log.Level;
 import me.wyne.wutils.log.Log;
 import me.wyne.wutils.log.Log4jFactory;
 import org.bigcraft.connection.config.SqlConfig;
-import org.bigcraft.connection.jdbc.DriverLibrary;
 import org.bigcraft.connection.module.ApiModule;
 import org.bigcraft.connection.module.CommandModule;
 import org.bigcraft.connection.module.ConnectionModule;
@@ -81,7 +80,6 @@ public class ConnectionSource extends JavaPlugin {
                 new File(getDataFolder(), "log").getPath(),
                 Log.global
         );
-        DriverLibrary.logger = log;
     }
 
     private void initializeConfig()
