@@ -23,7 +23,7 @@ dependencies {
     implementation(libs.ormLiteJdbc)
 
     implementation(libs.wutilsConfig)
-    implementation(libs.wutilsLog)
+    implementation(libs.wutilsCommon)
 }
 
 tasks {
@@ -33,9 +33,9 @@ tasks {
         archiveBaseName.set(findProperty("name").toString())
         archiveClassifier.set("")
         if (!isDebug) {
-            relocate("com.google.inject", "org.bigcraft.connection.shadow.google.guice")
-            relocate("com.google.common", "org.bigcraft.connection.shadow.google.common")
-            relocate("me.wyne.wutils", "org.bigcraft.connection.shadow.wutils")
+            relocate("com.google.inject", "me.wyne.connection.shadow.google.guice")
+            relocate("com.google.common", "me.wyne.connection.shadow.google.common")
+            relocate("me.wyne.wutils", "me.wyne.connection.shadow.wutils")
         }
     }
 
@@ -71,7 +71,7 @@ bukkit {
     version = getVersion().toString()
     website = findProperty("website").toString()
     author = findProperty("author").toString()
-    main = "org.bigcraft.connection.ConnectionSource"
+    main = "me.wyne.connection.ConnectionSource"
     apiVersion = "1.16"
     softDepend = listOf("CommandAPI")
     permissions {

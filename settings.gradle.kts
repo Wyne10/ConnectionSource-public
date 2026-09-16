@@ -16,9 +16,6 @@ dependencyResolutionManagement {
         maven {
             url = uri("https://repo.extendedclip.com/content/repositories/placeholderapi/")
         }
-        maven {
-            url = uri("https://mymavenrepo.com/repo/SjKIru68icwwmC0qOtV7/")
-        }
     }
 }
 include("api")
